@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Digite Sa&uacute;de Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+	<!--link rel="stylesheet/less" href="/less/bootstrap.less" type="text/css" /-->
+	<!--link rel="stylesheet/less" href="/less/responsive.less" type="text/css" /-->
+	<!--script src="javascripts/less-1.3.3.min.js"></script-->
+	<!--append ‘#!watch’ to the browser URL, then refresh the page. -->
+	
+	<link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
+	<link href="/stylesheets/style.css" rel="stylesheet">
+
+  <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+  <![endif]-->
+  
+	<script type="text/javascript" src="/javascripts/jquery.min.js"></script>
+	<script type="text/javascript" src="/javascripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/javascripts/porto-seguro.js"></script>
+    <script type="text/javascript" src="/javascripts/bootstrap-progressbar.js"></script>
+</head>
+    
+<body>
+<div class="container">
+    <div class="row clearfix">
+        <div class="page-header text-center">
+			<div class="media">
+				 <a href="#"  >
+                     <img src="/img/logo_digiteSaude.png" 
+                                    class="img-rounded" alt="Porto Seguro Digital" >
+                </a>
+                
+            </div>
+           
+     </div>
+         <div class="panel panel-default">
+				<div class="panel-heading" style="background-color: #f89422">
+					<h3 class="panel-title" style="text-align: center; color:#ffffff; font-weight: bold;">
+						Digite Sa&uacute;de Chat
+					</h3>
+				</div>
+<div class="panel-body">
+        <div id="telaUsername">
+            <form role="form" id="frmInformeUsuario">
+                    
+                   <div class="input-group">
+                      
+                      <input type="text" class="form-control" id="nome" placeholder="Nome" aria-describedby="basic-addon2" size="40" required>
+                       
+                    </div>
+                    <br/>
+                    <div class="input-group">
+                      <input type="text" class="form-control" id="login" placeholder="E-mail" aria-describedby="basic-addon2" size="40" required>
+                      
+                    </div>
+                    <br/>
+                     <button class="btn btn-default" type="submit">Entrar</button>
+                    
+                </form>
+            
+        </div>
+        <div id="telaNickName" class="form-group" style="display: none;" >
+             <form id="frmNickName" role="form">
+                <h3>Escreva seu nick:</h3>
+                <input type="text" size="30" id="nickname" placeholder="Digite seu nick" required />
+                <button class="btn btn-default" type="submit">Entrar</button>
+            </form>
+        </div>
+    <div id="salaChat" style="display:none;" class="row">
+     
+            <div class="row">
+              <div class="col-xs-12 col-sm-6 col-lg-8" >
+                
+                <div class="panel panel-default" style="width: 80; height: 280px;">
+                  <div class="panel-heading" style="background-color:#f89422; color: #ffffff;font-weight: bold;">Mensagens</div>
+                  <div class="panel-body">
+                   <div id="mensagens">
+                   </div>
+                  </div>
+                </div>
+                
+                </div>
+              <div  class="col-xs-6 col-lg-4">
+                 <div class="panel panel-default" style="width: 15; height: 280px">
+                  <div class="panel-heading" style="background-color:#f89422; color: #ffffff;font-weight: bold;">Usuarios</div>
+                  <div class="panel-body">
+                   <div id="usuarios">
+                   </div>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+            
+        <div  class="col-xs-12 col-sm-6 col-lg-8" >
+            <form id="frmMensagens">
+                <input type="text" size="87" id="cpMensagem" required />
+               <button class="btn btn-default" type="submit">Entrar</button>
+            </form>
+        </div>
+    </div>
+    </div>
+</div>
+        
+        
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        
+        <script>
+            $(function(){
+                var socket = io.connect();
+                
+                var salaChat = $("#salaChat");
+                var telaUsername = $("#telaUsername");
+                var telaNickName = $("#telaNickName");
+                var frmInformeUsuario = $("#frmInformeUsuario");
+                var frmNickName = $("#frmNickName");
+                var nickname = $("#nickname");
+                var frmMensagens = $("#frmMensagens");
+                var cpMensagem = $("#cpMensagem");
+                var divMensagens = $("#mensagens");
+                var divUsuarios = $("#usuarios");
+                var nome = $("#nome");
+                var login = $("#login");
+                
+                salaChat.hide();
+                telaNickName.hide();
+                
+                frmInformeUsuario.submit(function(e){
+                    e.preventDefault();
+                    socket.emit('novo usuario', login.val(), function(data){
+                        if(data.retorno){
+                            telaUsername.hide();
+                            telaNickName.show();
+                        } else {
+                            alert(data.msg);
+                            login.val("");
+                        }
+                    });
+                });                   
+                    
+
+                frmNickName.submit(function(e){
+                       e.preventDefault();
+                       socket.emit('novo nickName', nickname.val(), function(data){
+                           console.log(data.retorno);
+                        if(data.retorno){
+                            telaUsername.hide();
+                             telaNickName.hide();
+                            salaChat.show();
+                            cpMensagem.focus();
+                        } else {
+                             alert(data.msg);
+                            nickname.val("");
+                        }
+                    });
+               });
+                   
+                   
+                              
+                    frmMensagens.submit(function(e){
+                        e.preventDefault();
+                        socket.emit('enviar mensagem', cpMensagem.val());
+                        cpMensagem.val("");
+                    });
+                    
+                    socket.on('nova mensagem', function(data){
+                        divMensagens.append("<strong>"+data.nick+":</strong> "+data.msg +"<br/>");
+                    });
+                    
+                    socket.on('atualiza usuarios', function(usuarios){
+                        var listaUsuarios = "<ul>";
+                        
+                        $.each(usuarios, function(val, key){
+                            listaUsuarios += "<li>"+key+"</li>";
+                        });
+                        
+                        listaUsuarios += "</ul>";
+                        
+                        divUsuarios.empty().append(listaUsuarios);
+                    });
+            
+            });
+        </script>
+    </div>
+    </div>
+    </body>
+</head>

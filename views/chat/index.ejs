@@ -1,0 +1,41 @@
+    <% include ../header %>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io('http://localhost:3000');
+        socket.on('send-client', function (msg) {
+        document.getElementById('chat').innerHTML += msg;
+    });
+        var enviar = function() {
+        var nome = document.getElementById('nome').value;
+        var msg = document.getElementById('msg').value;
+        socket.emit('send-server', {nome: nome, msg: msg});
+    };
+    </script>
+      <section>
+<div class="panel panel-default">
+    <div class="panel-heading" style="background-color: #f89422">
+					<h3 class="panel-title" style="text-align: center; color:#ffffff; font-weight: bold;">
+						Digite Sa&uacute;de Chat
+					</h3>
+    </div>
+    <div class="panel-body">
+       <h4>Seja bem vindo ao no chat <span class="label label-warning"><%- nome.nome %></span></h4> 
+         <form role="form" action="/chat" method="post">
+            <input type="hidden" class="form-control" name="usuario[login]" value="<%- login %>">       
+            <div class="input-group">
+               <label>Escolha um Nickname:</label>       
+              <input type="text" class="form-control" name="usuario[nickname]"  placeholder="Nickname" aria-describedby="basic-addon2" size="40">
+            </div>
+            <br/>
+
+            <button class="btn btn-default" type="submit">Entrar</button>
+                    
+         </form>
+    </div>
+  
+   
+</div>
+    </section>
+        
+    <% include ../exit %>
+    <% include ../footer %>
